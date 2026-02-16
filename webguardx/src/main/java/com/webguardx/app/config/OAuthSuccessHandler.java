@@ -51,13 +51,17 @@ public class OAuthSuccessHandler implements AuthenticationSuccessHandler {
 
         String token = jwtUtil.generateToken(user.getEmail(), user.getRole());
 
-        response.setContentType("application/json");
-        response.getWriter().write("""
-        {
-          "token": "%s",
-          "email": "%s",
-          "role": "%s"
-        }
-        """.formatted(token, user.getEmail(), user.getRole()));
+//        response.setContentType("application/json");
+//        response.getWriter().write("""
+//        {
+//          "token": "%s",
+//          "email": "%s",
+//          "role": "%s"
+//        }
+//        """.formatted(token, user.getEmail(), user.getRole()));
+        response.sendRedirect(
+                "http://localhost:5173/oauth-success?token=" + token
+        );
+
     }
 }

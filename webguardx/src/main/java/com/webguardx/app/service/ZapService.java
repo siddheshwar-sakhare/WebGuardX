@@ -41,7 +41,7 @@ public class ZapService {
 
     public ScanResult scan(String targetUrl, boolean activeScan, User user) {
 
-        // Validate input
+
         if (targetUrl == null || targetUrl.trim().isEmpty()) {
             logger.error("Target URL is null or empty");
             return new ScanResult("ERROR: Target URL cannot be null or empty", new ArrayList<>());
