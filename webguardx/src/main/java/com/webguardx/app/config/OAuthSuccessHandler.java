@@ -15,6 +15,7 @@ import com.webguardx.app.repository.UserRepository;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 @Component
 public class OAuthSuccessHandler implements AuthenticationSuccessHandler {
 
@@ -62,6 +63,7 @@ public class OAuthSuccessHandler implements AuthenticationSuccessHandler {
         response.sendRedirect(
                 "http://localhost:5173/oauth-success?token=" + token
         );
+
 
     }
 }
