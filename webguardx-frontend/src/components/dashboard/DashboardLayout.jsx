@@ -3,16 +3,18 @@ import DashboardHeader from "./DashboardHeader";
 import StatsCards from "./StatsCards";
 import RecentActivity from "./RecentActivity";
 import QuickActions from "./QuickActions";
+import AnalyticsBoard from "./AnalyticsBoard";
 
 const DashboardLayout = () => {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-darkBg text-gray-200 font-sans selection:bg-neonBlue selection:text-white">
       <Navbar />
 
       {/* GAP AFTER NAVBAR */}
-      <div className="pt-24 px-6">
+      <div className="pt-24 px-6 pb-12">
         <div className="max-w-7xl mx-auto space-y-10">
           <DashboardHeader />
+          <AnalyticsBoard />
           <StatsCards />
           <div className="grid md:grid-cols-2 gap-8">
             <RecentActivity />
