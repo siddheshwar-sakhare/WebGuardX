@@ -5,7 +5,9 @@ import Dashboard from "./pages/Dashboard";
 import OAuthSuccess from "./auth/OAuthSuccess";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ZapScan from "./pages/ZapScan";
-
+import History from "./pages/History";
+import Developer from "./pages/Developer";
+import Settings from "./pages/Settings";
 function App() {
   return (
     <BrowserRouter>
@@ -30,6 +32,30 @@ function App() {
     </ProtectedRoute>
   }
 />
+        <Route
+          path="/history"
+          element={
+            <ProtectedRoute>
+              <History />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/developer"
+          element={
+            <ProtectedRoute>
+              <Developer />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <ProtectedRoute>
+              <Settings />
+            </ProtectedRoute>
+          }
+        />
 
       </Routes>
     </BrowserRouter>

@@ -1,118 +1,151 @@
-import React, { useState } from 'react';
-import { Shield, Zap, Lock, FileSearch, ChevronDown, ArrowRight, Eye, CheckCircle } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Shield, Lock, Activity, Target, CheckCircle2, ChevronRight, FileCode2 } from 'lucide-react';
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import Features from "../components/Features";
 import FAQ from "../components/FAQ";
 
 const Home = () => {
-  const [openFaq, setOpenFaq] = useState(null);
+  const [mounted, setMounted] = useState(false);
 
-  const steps = [
-    {
-      number: "01",
-      title: "Login Securely",
-      description: "Authenticate with Google OAuth for secure, hassle-free access to your dashboard.",
-      color: "red"
-    },
-    {
-      number: "02",
-      title: "Scan Website",
-      description: "Enter your URL and let OWASP ZAP engine perform comprehensive vulnerability analysis.",
-      color: "blue"
-    },
-    {
-      number: "03",
-      title: "View Security Report",
-      description: "Get detailed insights with severity ratings, exploit details, and fix recommendations.",
-      color: "red"
-    }
-  ];
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
-    <div className="min-h-screen bg-darkBg text-gray-200 overflow-hidden pt-24 font-sans selection:bg-neonBlue selection:text-white">
+    <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-indigo-100 selection:text-indigo-900">
       <Navbar />
       
-      {/* Background Effects */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-        <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-gradient-to-bl from-neonRed/10 via-transparent to-transparent opacity-40 blur-3xl"></div>
-        <div className="absolute bottom-0 left-0 w-[700px] h-[700px] bg-gradient-to-tr from-neonBlue/10 via-transparent to-transparent opacity-40 blur-3xl"></div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-br from-neonPurple/10 to-neonBlue/10 opacity-30 blur-3xl"></div>
+      {/* Background Decorative Mesh - Clean & Professional */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden bg-white">
+        {/* Soft top gradient */}
+        <div className="absolute top-0 inset-x-0 h-[500px] bg-gradient-to-b from-indigo-50/60 to-transparent"></div>
+        {/* Subtle glow spots */}
+        <div className="absolute top-[-20%] right-[-10%] w-[60%] h-[60%] rounded-full bg-indigo-50/40 blur-[100px]"></div>
+        <div className="absolute top-[20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-sky-50/40 blur-[100px]"></div>
       </div>
 
-      <div className="relative z-10">
+      <main className="relative z-10 pt-32 pb-16">
         {/* Hero Section */}
-        <section className="relative py-24 px-6 overflow-hidden">
+        <section className="relative px-6 xl:px-0 mb-32">
           <div className="max-w-7xl mx-auto">
-            <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div className="flex flex-col lg:flex-row items-center gap-16 lg:gap-12">
+              
               {/* Left Content */}
-              <div className="space-y-8 animate-fadeInUp">
-                <div className="inline-flex items-center gap-2 px-4 py-2 bg-darkCard/50 backdrop-blur-md rounded-full border border-gray-800">
-                  <Shield className="w-4 h-4 text-neonRed" />
-                  <span className="text-sm font-semibold text-gray-300 tracking-wide">ENTERPRISE SECURITY PLATFORM</span>
+              <div className={`flex-1 space-y-8 ${mounted ? 'animate-fade-in-up' : 'opacity-0'}`}>
+                {/* Badge */}
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-white rounded-full border border-slate-200 shadow-sm">
+                  <span className="flex h-2 w-2 relative">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-500 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-600"></span>
+                  </span>
+                  <span className="text-xs font-semibold text-slate-600 uppercase tracking-widest">Enterprise Class Security</span>
                 </div>
                 
-                <h1 className="text-6xl lg:text-7xl font-black leading-[1.1] tracking-tight">
-                  <span className="text-white">
-                    Protect Your Web
-                  </span>
-                  <br />
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-neonRed to-neonBlue">
-                    Applications
+                <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.1] tracking-tight text-slate-900">
+                  Secure your apps <br/>
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-sky-600">
+                    with confidence.
                   </span>
                 </h1>
                 
-                <p className="text-xl text-gray-400 leading-relaxed max-w-xl font-light">
-                  Advanced vulnerability scanning powered by <span className="font-semibold text-white">OWASP ZAP</span>. 
-                  Identify security threats, receive actionable insights, and fortify your digital infrastructure with confidence.
+                <p className="text-lg md:text-xl text-slate-500 max-w-xl leading-relaxed">
+                  WebGuardX provides deep vulnerability scanning using the powerful OWASP ZAP engine. Detect threats, analyze risks, and ship secure code faster.
                 </p>
                 
-                <div className="flex flex-wrap gap-4 pt-4">
-                  <button className="group px-8 py-4 bg-gradient-to-r from-neonRed to-red-700 text-white font-semibold rounded-xl hover:shadow-[0_0_20px_rgba(248,113,113,0.4)] hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-2">
-                    Start Scanning
-                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 pt-4">
+                  <button className="w-full sm:w-auto px-8 py-3.5 bg-slate-900 text-white font-medium rounded-xl hover:bg-slate-800 transition-all shadow-[0_8px_20px_rgba(0,0,0,0.1)] hover:shadow-[0_12px_25px_rgba(0,0,0,0.15)] hover:-translate-y-0.5 flex items-center justify-center gap-2">
+                    Start Free Scan
+                    <ChevronRight className="w-4 h-4" />
                   </button>
-                  <button className="px-8 py-4 bg-darkCard/80 backdrop-blur-md text-white font-semibold rounded-xl border border-gray-700 hover:border-neonBlue hover:bg-gray-800 transition-all duration-300 hover:-translate-y-0.5 flex items-center gap-2">
-                    <Eye className="w-5 h-5" />
-                    View Dashboard
+                  <button className="w-full sm:w-auto px-8 py-3.5 bg-white text-slate-700 font-medium rounded-xl border border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition-all shadow-sm">
+                    View Enterprise Demo
                   </button>
                 </div>
 
-                {/* Trust Indicators */}
-                <div className="flex items-center gap-8 pt-8 border-t border-gray-800">
+                <div className="pt-8 flex flex-wrap items-center gap-x-8 gap-y-4 text-sm text-slate-500 font-medium">
                   <div className="flex items-center gap-2">
-                    <CheckCircle className="w-5 h-5 text-neonGreen" />
-                    <span className="text-sm text-gray-400 font-medium">OWASP Compliant</span>
+                    <CheckCircle2 className="w-4 h-4 text-indigo-600" /> SOC2 Compliant
                   </div>
                   <div className="flex items-center gap-2">
-                    <CheckCircle className="w-5 h-5 text-neonGreen" />
-                    <span className="text-sm text-gray-400 font-medium">SOC 2 Certified</span>
+                    <CheckCircle2 className="w-4 h-4 text-indigo-600" /> OAuth 2.0 Ready
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-indigo-600" /> API Access
                   </div>
                 </div>
               </div>
 
-              {/* Right Illustration */}
-              <div className="relative lg:block hidden">
-                <div className="relative z-10 bg-darkCard/50 backdrop-blur-xl p-12 rounded-3xl border border-gray-800 shadow-2xl">
-                  <div className="space-y-6">
-                    {/* Shield Illustration */}
-                    <div className="relative mx-auto w-64 h-64 flex items-center justify-center">
-                      <div className="absolute inset-0 bg-gradient-to-br from-neonRed to-neonBlue rounded-full opacity-20 blur-2xl animate-pulse"></div>
-                      <Shield className="w-48 h-48 text-transparent stroke-neonRed stroke-[1.5]" strokeLinecap="round" strokeLinejoin="round" />
-                      <Lock className="absolute w-24 h-24 text-neonBlue" />
+              {/* Right Illustration - Clean Dashboard Window */}
+              <div className={`flex-1 w-full max-w-2xl mx-auto ${mounted ? 'animate-fade-in' : 'opacity-0'}`}>
+                <div className="relative animate-float rounded-2xl bg-white border border-slate-200 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.08)] overflow-hidden">
+                  
+                  {/* MacOS Style Header */}
+                  <div className="flex items-center px-4 py-3 border-b border-slate-100 bg-slate-50/80">
+                    <div className="flex gap-1.5">
+                      <div className="w-2.5 h-2.5 rounded-full bg-slate-300"></div>
+                      <div className="w-2.5 h-2.5 rounded-full bg-slate-300"></div>
+                      <div className="w-2.5 h-2.5 rounded-full bg-slate-300"></div>
                     </div>
-                    
-                    {/* Code Lines */}
-                    <div className="space-y-3 bg-[#0a0f1c] p-6 rounded-xl font-mono text-xs border border-gray-800 shadow-inner">
-                      <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                        <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                        <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                    <div className="mx-auto bg-white border border-slate-200 rounded-md px-24 py-1 text-xs text-slate-400 font-medium flex items-center gap-2 shadow-sm">
+                      <Lock className="w-3 h-3 text-emerald-500" />
+                      scanner.webguardx.io
+                    </div>
+                  </div>
+                  
+                  {/* Clean Dashboard Content */}
+                  <div className="p-8 bg-white space-y-6">
+                    {/* Status Target Card */}
+                    <div className="flex items-center justify-between p-4 rounded-xl border border-slate-100 bg-slate-50">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-white rounded-lg border border-slate-200 shadow-sm">
+                          <Target className="w-5 h-5 text-indigo-600" />
+                        </div>
+                        <div>
+                          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Target</p>
+                          <p className="font-medium text-slate-900">api.production-env.com</p>
+                        </div>
                       </div>
-                      <div className="text-neonGreen">$ webguardx scan --url https://example.com</div>
-                      <div className="text-neonBlue">→ Initializing OWASP ZAP engine...</div>
-                      <div className="text-yellow-400">→ Scanning for vulnerabilities...</div>
-                      <div className="text-neonGreen">✓ Scan complete: 0 high-risk issues found</div>
+                      <div className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs font-semibold flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        Scanning
+                      </div>
+                    </div>
+
+                    {/* Progress Area */}
+                    <div className="space-y-3">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-slate-600 font-medium">Active Scan Progress</span>
+                        <span className="text-slate-900 font-semibold">68%</span>
+                      </div>
+                      <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                        <div className="bg-indigo-600 h-2 rounded-full w-[68%] transition-all duration-1000 ease-in-out relative overflow-hidden">
+                          <div className="absolute inset-0 bg-white/20 animate-pulse-slow"></div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Vulnerabilities Detected */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="p-4 rounded-xl border border-red-100 bg-red-50/50">
+                        <p className="text-red-600 text-2xl font-bold">2</p>
+                        <p className="text-xs font-medium text-red-600 uppercase tracking-wide mt-1">High Risk</p>
+                      </div>
+                      <div className="p-4 rounded-xl border border-amber-100 bg-amber-50/50">
+                        <p className="text-amber-600 text-2xl font-bold">14</p>
+                        <p className="text-xs font-medium text-amber-600 uppercase tracking-wide mt-1">Medium Risk</p>
+                      </div>
+                    </div>
+
+                    {/* Terminal execution log mimic */}
+                    <div className="rounded-lg bg-slate-900 p-4 font-mono text-[11px] leading-relaxed relative overflow-hidden shadow-inner">
+                      <div className="absolute top-0 left-0 w-1 h-full bg-indigo-500"></div>
+                      <div className="text-slate-400 space-y-1">
+                        <p><span className="text-emerald-400">→</span> Injecting payload modules...</p>
+                        <p><span className="text-emerald-400">→</span> Testing SQLi constraints... <span className="text-white">[SAFE]</span></p>
+                        <p><span className="text-sky-400 opacity-70">Running DOM XSS analyzer on /login branch</span></p>
+                        <p className="text-amber-400">! Warning: Missing CSP header detected</p>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -121,44 +154,41 @@ const Home = () => {
           </div>
         </section>
 
-        <section className="relative py-24 px-6">
-          <div className="max-w-7xl mx-auto border-t border-gray-800 pt-16">
-            <div className="text-center mb-16 space-y-4">
-              <h2 className="text-4xl font-black text-white tracking-tight">
-                Security in Three Simple Steps
+        {/* Process Flow */}
+        <section className="bg-slate-50 py-24 border-y border-slate-200">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="text-center max-w-2xl mx-auto mb-16">
+              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight mb-4">
+                Automated security from commit to deploy
               </h2>
-              <p className="text-xl text-gray-400 max-w-2xl mx-auto font-light">
-                From authentication to actionable insights in minutes
+              <p className="text-slate-500 text-lg">
+                We've abstracted the complexity of enterprise security testing into three simple, manageable stages. No security expertise required.
               </p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-8 relative">
-              {steps.map((step, index) => (
-                <div key={index} className="relative">
-                  <div className="bg-darkCard/60 backdrop-blur-md p-8 rounded-2xl shadow-lg border border-gray-800 hover:border-gray-600 hover:-translate-y-2 transition-all duration-300">
-                    <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full font-black text-2xl mb-6 ${
-                      step.color === 'red'
-                        ? 'bg-gradient-to-br from-red-500 to-red-600 text-white shadow-[0_0_15px_rgba(239,68,68,0.5)]'
-                        : 'bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-[0_0_15px_rgba(59,130,246,0.5)]'
-                    }`}>
-                      {step.number}
-                    </div>
-
-                    <h3 className="text-2xl font-bold text-white mb-4 tracking-tight">
-                      {step.title}
-                    </h3>
-                    <p className="text-gray-400 leading-relaxed font-light">
-                      {step.description}
-                    </p>
+            <div className="grid md:grid-cols-3 gap-8">
+              {[
+                { title: "Authenticate Securely", desc: "Connect instantly with Enterprise SSO or Google OAuth 2.0 to access your isolated workspace.", icon: <Lock className="w-6 h-6" /> },
+                { title: "Execute Scans", desc: "Define your targets. We automatically map endpoints and execute deep OWASP-compliant active scans.", icon: <Activity className="w-6 h-6" /> },
+                { title: "Analyze & Remediate", desc: "Receive beautifully formatted reports highlighting vulnerabilities alongside specific code remediation steps.", icon: <FileCode2 className="w-6 h-6" /> }
+              ].map((step, idx) => (
+                <div key={idx} className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                  <div className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center mb-6">
+                    {step.icon}
                   </div>
+                  <h3 className="text-xl font-semibold text-slate-900 mb-3">{step.title}</h3>
+                  <p className="text-slate-500 leading-relaxed text-sm">{step.desc}</p>
                 </div>
               ))}
             </div>
           </div>
         </section>
-   
-        <Footer />
-      </div>
+
+        <Features />
+        <FAQ />
+      </main>
+
+      <Footer />
     </div>
   );
 };

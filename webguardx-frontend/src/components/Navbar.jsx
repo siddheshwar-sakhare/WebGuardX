@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { Shield, Menu, X } from "lucide-react";
+import { Shield, Menu, X, ChevronRight } from "lucide-react";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -8,19 +8,17 @@ const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
-  
-useEffect(() => {
-  const token = localStorage.getItem("token");
-  setIsLoggedIn(!!token);
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    setIsLoggedIn(!!token);
 
-  const handleScroll = () => {
-    setScrolled(window.scrollY > 10);
-  };
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 15);
+    };
 
-  window.addEventListener("scroll", handleScroll);
-  return () => window.removeEventListener("scroll", handleScroll);
-}, []);
-
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -31,143 +29,158 @@ useEffect(() => {
 
   return (
     <nav
-  className={`fixed top-0 left-0 w-full z-50 px-6 py-4 transition-all duration-300 ${
-    scrolled
-      ? "bg-white/80 backdrop-blur-lg shadow-md border-b border-gray-200"
-      : "bg-transparent"
-  }`}
->
-
+      className={`fixed top-0 left-0 w-full z-50 px-6 transition-all duration-300 ease-in-out ${
+        scrolled
+          ? "bg-white/80 backdrop-blur-lg border-b border-slate-200 py-3 shadow-sm"
+          : "bg-white/0 py-5"
+      }`}
+    >
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 group">
-          <div className="p-2 bg-gradient-to-br from-red-500 to-blue-600 rounded-lg group-hover:scale-110 transition-transform duration-300">
-            <Shield className="w-5 h-5 text-white" />
+          <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-indigo-600 text-white shadow-md group-hover:bg-indigo-700 transition-colors">
+            <Shield className="w-5 h-5" />
           </div>
-          <span className="text-2xl font-black bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+          <span className="text-xl font-bold text-slate-900 tracking-tight">
             WebGuardX
           </span>
         </Link>
 
         {/* Desktop Menu */}
-        <div className="hidden md:flex items-center gap-6">
+        <div className="hidden md:flex items-center gap-8">
           <Link
             to="/"
-            className="text-gray-700 hover:text-gray-900 font-medium transition-colors duration-200 hover:scale-105 transform"
+            className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
           >
             Home
           </Link>
 
           {!isLoggedIn ? (
-            <>
+            <div className="flex items-center gap-4 pl-4 border-l border-slate-200">
               <Link
                 to="/login"
-                className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200"
+                className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
               >
-                Login
+                Sign In
               </Link>
               <Link
                 to="/signup"
-                className="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-md shadow-blue-500/30 hover:shadow-lg hover:shadow-blue-500/40 hover:-translate-y-0.5"
+                className="group relative px-5 py-2.5 bg-slate-900 text-white text-sm font-medium rounded-lg hover:bg-slate-800 transition-all shadow-sm flex items-center gap-1.5"
               >
-                Sign Up
+                <span>Get Started</span>
+                <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
               </Link>
-            </>
+            </div>
           ) : (
-            <>
+            <div className="flex items-center gap-5 pl-4 border-l border-slate-200">
+              <Link
+                to="/history"
+                className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
+              >
+                History
+              </Link>
+              <Link
+                to="/developer"
+                className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
+              >
+                Developer
+              </Link>
+              <Link
+                to="/settings"
+                className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
+              >
+                Settings
+              </Link>
               <Link
                 to="/dashboard"
-                className="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-md shadow-blue-500/30 hover:shadow-lg hover:shadow-blue-500/40 hover:-translate-y-0.5"
+                className="px-5 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-all shadow-sm"
               >
                 Dashboard
               </Link>
               <button
                 onClick={handleLogout}
-                className="px-6 py-2.5 border-2 border-gray-200 text-gray-700 font-semibold rounded-lg hover:border-red-600 hover:bg-red-50 hover:text-red-600 transition-all duration-300 hover:-translate-y-0.5"
+                className="text-sm font-medium text-slate-600 hover:text-red-600 transition-colors"
               >
                 Logout
               </button>
-            </>
+            </div>
           )}
         </div>
 
         {/* Mobile Menu Button */}
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200"
+          className="md:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors"
         >
-          {isMobileMenuOpen ? (
-            <X className="w-6 h-6 text-gray-700" />
-          ) : (
-            <Menu className="w-6 h-6 text-gray-700" />
-          )}
+          {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
       </div>
 
-      {/* Mobile Menu */}
-      {isMobileMenuOpen && (
-        <div className="md:hidden mt-4 pt-4 border-t border-gray-200 space-y-3 animate-fadeIn">
+      {/* Mobile Menu Overlay */}
+      <div
+        className={`md:hidden absolute top-full left-0 w-full bg-white border-b border-slate-200 shadow-lg overflow-hidden transition-all duration-300 ease-in-out ${
+          isMobileMenuOpen ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
+        }`}
+      >
+        <div className="p-6 flex flex-col gap-4">
           <Link
             to="/"
             onClick={() => setIsMobileMenuOpen(false)}
-            className="block px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-lg font-medium transition-colors duration-200"
+            className="text-base font-medium text-slate-600 hover:text-slate-900"
           >
             Home
           </Link>
 
           {!isLoggedIn ? (
-            <>
+            <div className="pt-4 border-t border-slate-100 flex flex-col gap-3">
               <Link
                 to="/login"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="block px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-lg font-medium transition-colors duration-200"
+                className="text-base font-medium text-slate-600 hover:text-slate-900"
               >
-                Login
+                Sign In
               </Link>
               <Link
                 to="/signup"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="block px-4 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-lg text-center hover:from-blue-700 hover:to-blue-800 transition-all duration-300"
+                className="w-full px-5 py-3 bg-slate-900 text-white font-medium rounded-lg text-center"
               >
-                Sign Up
+                Get Started
               </Link>
-            </>
+            </div>
           ) : (
-            <>
+            <div className="pt-4 border-t border-slate-100 flex flex-col gap-3">
+              <Link
+                to="/history"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="text-base font-medium text-slate-600 hover:text-slate-900"
+              >
+                History
+              </Link>
+              <Link
+                to="/developer"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="text-base font-medium text-slate-600 hover:text-slate-900"
+              >
+                Developer
+              </Link>
               <Link
                 to="/dashboard"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="block px-4 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-lg text-center hover:from-blue-700 hover:to-blue-800 transition-all duration-300"
+                className="w-full px-5 py-3 bg-indigo-600 text-white font-medium rounded-lg text-center"
               >
                 Dashboard
               </Link>
               <button
                 onClick={handleLogout}
-                className="w-full px-4 py-2.5 border-2 border-gray-200 text-gray-700 font-semibold rounded-lg hover:border-red-600 hover:bg-red-50 hover:text-red-600 transition-all duration-300"
+                className="text-left text-base font-medium text-slate-600 hover:text-red-600"
               >
                 Logout
               </button>
-            </>
+            </div>
           )}
         </div>
-      )}
-
-      <style jsx>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(-10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
-        .animate-fadeIn {
-          animation: fadeIn 0.3s ease-out forwards;
-        }
-      `}</style>
+      </div>
     </nav>
   );
 };

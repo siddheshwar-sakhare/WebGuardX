@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronDown, Shield, Lock, Zap, HelpCircle } from 'lucide-react';
+import { ChevronDown, MessageCircle } from 'lucide-react';
 
 const FAQ = () => {
   const [openFaq, setOpenFaq] = useState(null);
@@ -10,150 +10,81 @@ const FAQ = () => {
 
   const faqs = [
     {
-      question: "What is WebGuardX?",
-      answer: "WebGuardX is a comprehensive vulnerability scanning platform built with modern technologies including Spring Boot, React, MongoDB, and OWASP ZAP. It provides enterprise-grade security testing for web applications with real-time threat detection and detailed reporting.",
-      icon: <Shield className="w-5 h-5" />,
-      color: "blue"
+      question: "What exactly is WebGuardX?",
+      answer: "WebGuardX is an enterprise-grade platform that automates Dynamic Application Security Testing (DAST). By wrapping the powerful OWASP ZAP engine in a modern React & Spring Boot architecture, it provides deep security analysis and reporting without the massive learning curve."
     },
     {
-      question: "How does scanning work?",
-      answer: "The platform sends target URLs to the OWASP ZAP API, which performs comprehensive security testing including penetration testing, spider scanning, and active/passive vulnerability analysis. Results are analyzed, categorized by severity, and presented in an intuitive dashboard with actionable remediation steps.",
-      icon: <Zap className="w-5 h-5" />,
-      color: "red"
+      question: "How does the scanning engine work?",
+      answer: "When a target URL is submitted, the backend proxies the request to our isolated OWASP ZAP instances. It performs active spidering to map the application surface, followed by active scanning which injects payloads to test for XSS, SQLi, CSRF, and hundreds of other vulnerabilities."
     },
     {
-      question: "Is authentication secure?",
-      answer: "Absolutely. We implement Google OAuth 2.0 for authentication and JWT (JSON Web Tokens) for secure session management. All data transmission is encrypted using industry-standard protocols, ensuring your credentials and scan data remain protected at all times.",
-      icon: <Lock className="w-5 h-5" />,
-      color: "blue"
+      question: "Is my authentication data secure?",
+      answer: "Yes. WebGuardX delegates primary authentication to Google Identity Services via OAuth 2.0. Internal platform sessions are managed using hardened JWTs with strict expiration policies, meaning we never store raw passwords."
     },
     {
-      question: "Do I need technical knowledge to use WebGuardX?",
-      answer: "No technical expertise required. Our platform is designed for both security professionals and non-technical users. The dashboard presents findings in clear, understandable language with visual severity indicators and step-by-step remediation guidance.",
-      icon: <HelpCircle className="w-5 h-5" />,
-      color: "red"
+      question: "Can I export scan reports for compliance?",
+      answer: "Absolutely. Scan histories are securely retained, and you can delve into each vulnerability, exporting the findings in various formats suitable for compliance audits (like SOC2) and developer remediation tracking."
     }
   ];
 
   return (
-    <section className="relative py-24 px-6 bg-gradient-to-b from-white via-gray-50 to-white overflow-hidden">
-      {/* Background Effects */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 right-1/4 w-96 h-96 bg-blue-100 rounded-full opacity-20 blur-3xl"></div>
-        <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-red-100 rounded-full opacity-20 blur-3xl"></div>
-      </div>
-
-      <div className="max-w-4xl mx-auto relative z-10">
-        {/* Header */}
-        <div className="text-center mb-16 space-y-4">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-full border border-gray-200 shadow-sm mb-4">
-            <HelpCircle className="w-4 h-4 text-blue-600" />
-            <span className="text-sm font-semibold text-gray-700 tracking-wide">SUPPORT</span>
-          </div>
-          
-          <h2 className="text-5xl md:text-6xl font-black text-gray-900 tracking-tight">
-            Frequently Asked
-            <span className="block bg-gradient-to-r from-blue-600 to-red-600 bg-clip-text text-transparent">
-              Questions
-            </span>
+    <section className="py-24 px-6 bg-slate-50 border-t border-slate-200">
+      <div className="max-w-3xl mx-auto">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight mb-4">
+            Answers to your questions
           </h2>
-          
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto font-light">
-            Everything you need to know about WebGuardX security platform
+          <p className="text-lg text-slate-500">
+            Learn the technical details behind WebGuardX security scanning.
           </p>
         </div>
 
-        {/* FAQ Items */}
-        <div className="space-y-4">
+        <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden divide-y divide-slate-100">
           {faqs.map((faq, index) => (
-            <div
-              key={index}
-              className="group bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 border-2 border-gray-100 hover:border-gray-200 overflow-hidden"
-            >
-              {/* Question Button */}
+            <div key={index} className="group">
               <button
                 onClick={() => toggleFaq(index)}
-                className="w-full px-6 md:px-8 py-6 flex items-start md:items-center gap-4 text-left hover:bg-gray-50 transition-colors duration-200"
+                className="w-full px-6 py-5 flex items-center justify-between text-left focus:outline-none hover:bg-slate-50/50 transition-colors"
               >
-                {/* Icon */}
-                <div className={`flex-shrink-0 p-3 rounded-xl transition-all duration-300 ${
-                  openFaq === index
-                    ? faq.color === 'blue'
-                      ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/30'
-                      : 'bg-gradient-to-br from-red-500 to-red-600 text-white shadow-lg shadow-red-500/30'
-                    : 'bg-gray-100 text-gray-600 group-hover:bg-gray-200'
-                }`}>
-                  {faq.icon}
-                </div>
-
-                {/* Question Text */}
-                <span className="flex-1 text-lg md:text-xl font-bold text-gray-900 pr-4">
+                <span className="text-base font-semibold text-slate-900">
                   {faq.question}
                 </span>
-
-                {/* Chevron */}
                 <ChevronDown
-                  className={`flex-shrink-0 w-6 h-6 transition-all duration-300 ${
-                    openFaq === index 
-                      ? 'rotate-180 ' + (faq.color === 'blue' ? 'text-blue-600' : 'text-red-600')
-                      : 'text-gray-400 group-hover:text-gray-600'
+                  className={`flex-shrink-0 w-5 h-5 text-slate-400 transition-transform duration-300 ${
+                    openFaq === index ? "rotate-180 text-indigo-600" : ""
                   }`}
                 />
               </button>
 
-              {/* Answer Panel */}
               <div
-                className={`overflow-hidden transition-all duration-500 ease-in-out ${
-                  openFaq === index ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                  openFaq === index ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
                 }`}
               >
-                <div className="px-6 md:px-8 pb-6 pt-2 pl-20 md:pl-24">
-                  {/* Accent Line */}
-                  <div className={`h-1 w-16 rounded-full mb-4 ${
-                    faq.color === 'blue'
-                      ? 'bg-gradient-to-r from-blue-500 to-blue-600'
-                      : 'bg-gradient-to-r from-red-500 to-red-600'
-                  }`}></div>
-                  
-                  {/* Answer Text */}
-                  <p className="text-gray-700 leading-relaxed text-base">
-                    {faq.answer}
-                  </p>
+                <div className="px-6 pb-6 pt-2 text-slate-500 text-sm leading-relaxed">
+                  {faq.answer}
                 </div>
               </div>
-
-              {/* Bottom Border Accent (only when open) */}
-              {openFaq === index && (
-                <div className={`h-1 w-full ${
-                  faq.color === 'blue'
-                    ? 'bg-gradient-to-r from-transparent via-blue-500 to-transparent'
-                    : 'bg-gradient-to-r from-transparent via-red-500 to-transparent'
-                } opacity-30`}></div>
-              )}
             </div>
           ))}
         </div>
 
-        {/* Bottom CTA */}
-        <div className="mt-16 text-center">
-          <div className="bg-gradient-to-r from-gray-900 to-gray-800 rounded-2xl p-8 md:p-12 shadow-2xl relative overflow-hidden">
-            {/* Decorative Elements */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-blue-500/20 to-transparent rounded-full blur-3xl"></div>
-            <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-red-500/20 to-transparent rounded-full blur-3xl"></div>
-            
-            <div className="relative z-10 space-y-4">
-              <h3 className="text-2xl md:text-3xl font-bold text-white">
-                Still have questions?
-              </h3>
-              <p className="text-gray-400 max-w-xl mx-auto">
-                Our security team is here to help. Get in touch and we'll answer any questions about WebGuardX.
-              </p>
-              <button className="mt-6 px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 hover:-translate-y-0.5">
-                Contact Support
-              </button>
+        {/* Support Banner */}
+        <div className="mt-12 bg-white rounded-2xl p-6 md:p-8 border border-slate-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-indigo-50 rounded-full flex items-center justify-center text-indigo-600 flex-shrink-0">
+              <MessageCircle className="w-6 h-6" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-slate-900">Still have questions?</h3>
+              <p className="text-slate-500 text-sm mt-1">Our engineering team is happy to assist you.</p>
             </div>
           </div>
+          <button className="whitespace-nowrap px-6 py-2.5 border border-slate-200 text-slate-700 font-medium rounded-lg hover:bg-slate-50 transition-colors shadow-sm">
+            Contact Support
+          </button>
         </div>
+
       </div>
     </section>
   );
