@@ -19,134 +19,128 @@ const Developer = () => {
   };
 
   return (
-    <div className="min-h-screen bg-darkBg text-gray-200 font-sans selection:bg-neonRed selection:text-white pt-24">
+    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-indigo-100 selection:text-indigo-900 pt-32 pb-20">
       <Navbar />
-      
-      {/* Background Effects */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-gradient-to-bl from-neonRed/10 to-transparent opacity-20 blur-3xl"></div>
-        <div className="absolute bottom-1/2 left-0 w-[500px] h-[500px] bg-gradient-to-r from-neonBlue/10 to-transparent opacity-20 blur-3xl"></div>
-      </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 pb-16">
+      <div className="relative z-10 max-w-7xl mx-auto px-6">
         <div className="mb-10 animate-fadeInUp">
-          <h1 className="text-4xl font-black text-white tracking-tight mb-2">Developer Hub</h1>
-          <p className="text-gray-400">Manage API keys, configure webhooks, and integrate WebGuardX into your CI/CD pipelines.</p>
+          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mb-2">Developer Hub</h1>
+          <p className="text-slate-500 text-lg">Manage API keys, configure webhooks, and integrate WebGuardX into your pipelines.</p>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8">
           
           {/* API Keys Panel (Spans 2 columns) */}
-          <div className="lg:col-span-2 space-y-8">
-            <div className="bg-darkCard/50 backdrop-blur-xl border border-gray-800 rounded-2xl p-8 shadow-2xl">
-              <div className="flex items-center gap-4 mb-6">
-                <div className="p-3 bg-neonRed/10 rounded-xl border border-neonRed/20">
-                  <Key className="w-6 h-6 text-neonRed" />
+          <div className="lg:col-span-2 space-y-6">
+            <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)]">
+              <div className="flex items-center gap-4 mb-6 pb-4 border-b border-slate-100">
+                <div className="p-3 bg-slate-100 rounded-xl border border-slate-200">
+                  <Key className="w-5 h-5 text-slate-700" />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-white">Production API Keys</h2>
-                  <p className="text-sm text-gray-400">Use these keys to authenticate headless scan requests.</p>
+                  <h2 className="text-xl font-bold text-slate-900">Production API Keys</h2>
+                  <p className="text-sm text-slate-500 mt-0.5">Use these keys to authenticate headless scan requests.</p>
                 </div>
               </div>
 
-              <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
+              <div className="bg-slate-50 border border-slate-200 rounded-xl p-6">
                 <div className="flex justify-between items-center mb-4">
-                  <span className="text-sm font-semibold text-gray-300">Default API Key</span>
-                  <span className="px-3 py-1 bg-green-500/10 text-green-400 text-xs rounded-full border border-green-500/20">Active</span>
+                  <span className="text-sm font-bold text-slate-700">Default API Key</span>
+                  <span className="px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full border border-emerald-200">Active Status</span>
                 </div>
                 
-                <div className="flex gap-4">
+                <div className="flex flex-col sm:flex-row gap-3">
                   <div className="flex-1 relative">
                     <input 
                       type="text" 
                       readOnly 
                       value={apiKey}
-                      className="w-full bg-black/40 border border-gray-700 rounded-lg py-3 px-4 text-neonRed font-mono focus:outline-none"
+                      className="w-full bg-white border border-slate-300 rounded-lg py-3 px-4 text-emerald-600 font-mono font-bold focus:outline-none shadow-sm"
                     />
                   </div>
                   <button 
                     onClick={copyToClipboard}
-                    className="p-3 bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-700 rounded-lg transition-colors flex items-center justify-center min-w-[3rem]"
+                    className="p-3 bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 rounded-lg transition-colors flex items-center justify-center min-w-[3rem] shadow-sm"
                     title="Copy to clipboard"
                   >
-                    {copied ? <CheckCircle2 className="w-5 h-5 text-green-400" /> : <Copy className="w-5 h-5" />}
+                    {copied ? <CheckCircle2 className="w-5 h-5 text-emerald-500" /> : <Copy className="w-5 h-5" />}
                   </button>
                   <button 
                     onClick={generateNewKey}
-                    className="flex items-center gap-2 px-6 bg-red-600/20 hover:bg-red-600/30 text-red-500 border border-red-500/30 rounded-lg transition-colors font-medium"
+                    className="flex items-center justify-center gap-2 px-6 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-lg transition-colors font-bold shadow-sm"
                   >
                     <RefreshCw className="w-4 h-4" />
                     Roll Key
                   </button>
                 </div>
-                <p className="mt-3 text-xs text-yellow-500/80">Warning: Rolling the key will immediately revoke access for all applications using the old key.</p>
+                <p className="mt-3 text-xs font-medium text-amber-600">Warning: Rolling the key will immediately revoke access for all CI/CD pipelines currently using it.</p>
               </div>
             </div>
 
-            {/* Quickstart Code */}
-            <div className="bg-darkCard/50 backdrop-blur-xl border border-gray-800 rounded-2xl p-8 shadow-2xl">
+            {/* Quickstart Code - Keeps dark theme as it's a code block */}
+            <div className="bg-slate-900 rounded-2xl p-8 shadow-xl border border-slate-800">
               <div className="flex items-center gap-4 mb-6">
-                <div className="p-3 bg-gray-800 rounded-xl border border-gray-700">
-                  <TerminalSquare className="w-6 h-6 text-gray-300" />
+                <div className="p-3 bg-slate-800 rounded-xl border border-slate-700">
+                  <TerminalSquare className="w-5 h-5 text-slate-300" />
                 </div>
                 <h2 className="text-xl font-bold text-white">cURL Quickstart</h2>
               </div>
-              <div className="bg-[#0a0f1c] border border-gray-800 rounded-xl p-4 font-mono text-sm overflow-x-auto text-gray-300">
-                <span className="text-pink-500">curl</span> -X POST https://api.webguardx.com/v1/scans \<br/>
-                &nbsp;&nbsp;-H <span className="text-green-400">"Authorization: Bearer {apiKey}"</span> \<br/>
-                &nbsp;&nbsp;-H <span className="text-green-400">"Content-Type: application/json"</span> \<br/>
-                &nbsp;&nbsp;-d <span className="text-yellow-300">'&#123;"target": "https://example.com"&#125;'</span>
+              <div className="bg-[#030712] border border-slate-800/50 rounded-xl p-5 font-mono text-sm overflow-x-auto text-slate-300 leading-relaxed shadow-inner">
+                <span className="text-pink-400">curl</span> -X POST https://api.webguardx.com/v1/scans \<br/>
+                &nbsp;&nbsp;-H <span className="text-emerald-400">"Authorization: Bearer {apiKey}"</span> \<br/>
+                &nbsp;&nbsp;-H <span className="text-emerald-400">"Content-Type: application/json"</span> \<br/>
+                &nbsp;&nbsp;-d <span className="text-amber-300">'&#123;"target": "https://example.com"&#125;'</span>
               </div>
             </div>
           </div>
 
           {/* Webhooks Panel */}
-          <div className="space-y-8">
-            <div className="bg-darkCard/50 backdrop-blur-xl border border-gray-800 rounded-2xl p-8 shadow-2xl h-full">
-              <div className="flex items-center gap-4 mb-6">
-                <div className="p-3 bg-neonBlue/10 rounded-xl border border-neonBlue/20">
-                  <Webhook className="w-6 h-6 text-neonBlue" />
+          <div className="space-y-6">
+            <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] h-full">
+              <div className="flex items-center gap-4 mb-6 pb-4 border-b border-slate-100">
+                <div className="p-3 bg-indigo-50 rounded-xl border border-indigo-100">
+                  <Webhook className="w-5 h-5 text-indigo-600" />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-white">Webhooks</h2>
+                  <h2 className="text-xl font-bold text-slate-900">Automation Webhooks</h2>
                 </div>
               </div>
 
               <div className="space-y-6">
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-gray-400 tracking-wide uppercase">Slack / Discord Endpoint URL</label>
+                  <label className="text-xs font-bold text-slate-500 tracking-wide uppercase">Slack / Discord URL</label>
                   <input 
                     type="text" 
                     value={webhookUrl}
                     onChange={(e) => setWebhookUrl(e.target.value)}
-                    className="w-full bg-gray-900/50 border border-gray-700 rounded-lg py-3 px-4 text-gray-200 focus:outline-none focus:border-neonBlue transition-colors"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-slate-900 font-medium focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all placeholder-slate-400"
                   />
                 </div>
 
                 <div className="space-y-3">
-                  <label className="text-sm font-semibold text-gray-400 tracking-wide uppercase">Event Triggers</label>
-                  <div className="bg-gray-900/40 p-4 rounded-xl border border-gray-800/80 space-y-3">
+                  <label className="text-xs font-bold text-slate-500 tracking-wide uppercase">Event Triggers</label>
+                  <div className="bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-4">
                     <label className="flex items-center gap-3 cursor-pointer">
-                      <input type="checkbox" defaultChecked className="w-4 h-4 rounded border-gray-700 bg-gray-800 text-neonBlue focus:ring-neonBlue focus:ring-offset-gray-900" />
-                      <span className="text-sm text-gray-300">Scan Started</span>
+                      <input type="checkbox" defaultChecked className="w-5 h-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
+                      <span className="text-sm font-semibold text-slate-700">Scan Started</span>
                     </label>
                     <label className="flex items-center gap-3 cursor-pointer">
-                      <input type="checkbox" defaultChecked className="w-4 h-4 rounded border-gray-700 bg-gray-800 text-neonBlue focus:ring-neonBlue focus:ring-offset-gray-900" />
-                      <span className="text-sm text-gray-300">Scan Completed</span>
+                      <input type="checkbox" defaultChecked className="w-5 h-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
+                      <span className="text-sm font-semibold text-slate-700">Scan Completed</span>
                     </label>
                     <label className="flex items-center gap-3 cursor-pointer">
-                      <input type="checkbox" defaultChecked className="w-4 h-4 rounded border-gray-700 bg-gray-800 text-neonBlue focus:ring-neonBlue focus:ring-offset-gray-900" />
-                      <span className="text-sm text-gray-300">High-Risk Vulnerability Found</span>
+                      <input type="checkbox" defaultChecked className="w-5 h-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
+                      <span className="text-sm font-bold text-red-600">High-Risk Vulnerability Found</span>
                     </label>
                   </div>
                 </div>
 
-                <button className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold rounded-xl transition-all shadow-[0_0_15px_rgba(59,130,246,0.3)]">
-                  Save Webhook
+                <button className="w-full py-3.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl transition-all shadow-[0_4px_15px_-3px_rgba(0,0,0,0.1)] hover:shadow-lg">
+                  Save Configuration
                 </button>
                 
-                <div className="pt-4 border-t border-gray-800 flex justify-center">
-                  <button className="text-sm text-gray-400 hover:text-white flex items-center gap-2 transition-colors">
+                <div className="pt-5 border-t border-slate-100 flex justify-center">
+                  <button className="text-sm font-semibold text-slate-500 hover:text-indigo-600 flex items-center gap-2 transition-colors">
                     <Bot className="w-4 h-4" /> Send Test Payload
                   </button>
                 </div>

@@ -8,6 +8,7 @@ import ZapScan from "./pages/ZapScan";
 import History from "./pages/History";
 import Developer from "./pages/Developer";
 import Settings from "./pages/Settings";
+import NmapScan from "./pages/NmapScan";
 function App() {
   return (
     <BrowserRouter>
@@ -32,6 +33,14 @@ function App() {
     </ProtectedRoute>
   }
 />
+        <Route
+          path="/nmap-scan"
+          element={
+            <ProtectedRoute>
+              <NmapScan />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/history"
           element={

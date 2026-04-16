@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { DownloadCloud, FileText } from "lucide-react";
+import { DownloadCloud, FileText, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const RecentActivity = () => {
   const [history, setHistory] = useState([]);
@@ -37,31 +38,39 @@ const RecentActivity = () => {
   };
 
   return (
-    <div className="bg-darkCard backdrop-blur-lg border border-gray-800 rounded-2xl p-6 shadow-[0_0_15px_rgba(0,0,0,0.2)]">
-      <h3 className="font-semibold text-gray-100 mb-4 text-xl">
-        Recent Scans
-      </h3>
+    <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)]">
+      <div className="flex justify-between items-center mb-6">
+        <h3 className="font-bold text-slate-900 text-lg">
+          Recent Scans
+        </h3>
+        <Link to="/history" className="text-sm font-medium text-indigo-600 hover:text-indigo-700 flex items-center gap-1">
+          View All <ArrowRight className="w-4 h-4" />
+        </Link>
+      </div>
+
       {history.length === 0 ? (
-        <p className="text-gray-500 text-sm">No recent scans found.</p>
+        <div className="py-8 text-center bg-slate-50 rounded-xl border border-slate-100 border-dashed">
+          <p className="text-slate-500 text-sm font-medium">No recent scans found.</p>
+        </div>
       ) : (
-        <ul className="space-y-4">
+        <ul className="space-y-3">
           {history.map((scan) => (
-            <li key={scan.id} className="flex justify-between items-center bg-gray-800/40 p-3 rounded-lg hover:bg-gray-800/80 transition-colors">
+            <li key={scan.id} className="flex justify-between items-center bg-slate-50 border border-slate-100 p-4 rounded-xl hover:bg-slate-100 hover:border-slate-200 transition-colors">
               <div>
-                <p className="text-gray-300 text-sm font-medium">{scan.targetUrl}</p>
-                <p className="text-gray-500 text-xs">{new Date(scan.scannedAt).toLocaleDateString()}</p>
+                <p className="text-slate-900 text-sm font-bold">{scan.targetUrl}</p>
+                <p className="text-slate-500 text-xs mt-0.5 font-medium">{new Date(scan.scannedAt).toLocaleDateString()}</p>
               </div>
               <div className="flex gap-2">
                 <button 
                   onClick={() => handleDownload(scan.id, 'pdf')}
-                  className="p-2 bg-red-500/10 text-red-400 hover:bg-red-500/20 hover:text-red-300 rounded-lg transition-all"
+                  className="p-2 bg-white text-red-500 hover:bg-red-50 hover:text-red-600 rounded-lg border border-slate-200 transition-all shadow-sm"
                   title="Export PDF"
                 >
                   <FileText className="w-4 h-4" />
                 </button>
                 <button 
                   onClick={() => handleDownload(scan.id, 'csv')}
-                  className="p-2 bg-green-500/10 text-green-400 hover:bg-green-500/20 hover:text-green-300 rounded-lg transition-all"
+                  className="p-2 bg-white text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700 rounded-lg border border-slate-200 transition-all shadow-sm"
                   title="Export CSV"
                 >
                   <DownloadCloud className="w-4 h-4" />

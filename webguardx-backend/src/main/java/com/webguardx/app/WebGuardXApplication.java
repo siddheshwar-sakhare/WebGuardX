@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class WebGuardXApplication {
 
 	public static void main(String[] args) {
+
 		SpringApplication.run(WebGuardXApplication.class, args);
 	}
 

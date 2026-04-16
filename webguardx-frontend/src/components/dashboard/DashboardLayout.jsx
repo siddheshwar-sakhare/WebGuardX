@@ -7,12 +7,12 @@ import AnalyticsBoard from "./AnalyticsBoard";
 
 const DashboardLayout = () => {
   return (
-    <div className="min-h-screen bg-darkBg text-gray-200 font-sans selection:bg-neonBlue selection:text-white">
+    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-indigo-100 selection:text-indigo-900">
       <Navbar />
 
       {/* GAP AFTER NAVBAR */}
-      <div className="pt-24 px-6 pb-12">
-        <div className="max-w-7xl mx-auto space-y-10">
+      <div className="pt-28 px-6 pb-12">
+        <div className="max-w-7xl mx-auto space-y-8">
           <DashboardHeader />
           <AnalyticsBoard />
           <StatsCards />
