@@ -9,6 +9,9 @@ import History from "./pages/History";
 import Developer from "./pages/Developer";
 import Settings from "./pages/Settings";
 import NmapScan from "./pages/NmapScan";
+import ApiSecurityScan from "./pages/ApiSecurityScan";
+import ScannerSuite from "./pages/ScannerSuite";
+
 function App() {
   return (
     <BrowserRouter>
@@ -38,6 +41,22 @@ function App() {
           element={
             <ProtectedRoute>
               <NmapScan />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/api-scan"
+          element={
+            <ProtectedRoute>
+              <ApiSecurityScan />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/scanners"
+          element={
+            <ProtectedRoute>
+              <ScannerSuite />
             </ProtectedRoute>
           }
         />

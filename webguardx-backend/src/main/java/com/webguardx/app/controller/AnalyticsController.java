@@ -30,19 +30,20 @@ public class AnalyticsController {
 
         response.put("totalScans", histories.size());
 
-        // Count High, Medium, Low, Informational
-        int high = 0, medium = 0, low = 0, info = 0;
+        // Count Critical, High, Medium, Low, Informational
+        int critical = 0, high = 0, medium = 0, low = 0, info = 0;
 
         for (ScanHistory history : histories) {
             if (history.getAlerts() != null) {
                 for (ZapAlert alert : history.getAlerts()) {
-                    String risk = alert.getRisk();
-                    if (risk != null) {
-                        switch (risk.toLowerCase()) {
-                            case "high": high++; break;
-                            case "medium": medium++; break;
-                            case "low": low++; break;
-                            case "informational": info++; break;
+                    String level = alert.getPriority() != null ? alert.getPriority() : alert.getRisk();
+                    if (level != null) {
+                        switch (level.toUpperCase()) {
+                            case "CRITICAL": critical++; break;
+                            case "HIGH": high++; break;
+                            case "MEDIUM": medium++; break;
+                            case "LOW": low++; break;
+                            case "INFORMATIONAL": info++; break;
                         }
                     }
                 }
@@ -50,6 +51,7 @@ public class AnalyticsController {
         }
 
         Map<String, Integer> riskDistribution = new HashMap<>();
+        riskDistribution.put("Critical", critical);
         riskDistribution.put("High", high);
         riskDistribution.put("Medium", medium);
         riskDistribution.put("Low", low);

@@ -1,15 +1,32 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import { User, Bell, Shield as ShieldIcon, Save, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import api from "../api/axios";
 
 const Settings = () => {
   const navigate = useNavigate();
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [twoFactorAuth, setTwoFactorAuth] = useState(false);
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const res = await api.get('/api/user/profile');
+        setProfile(res.data);
+      } catch (err) {
+        console.error("Failed to fetch profile", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProfile();
+  }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("jwtToken");
+    localStorage.removeItem("token");
     navigate("/login");
   };
 
@@ -35,20 +52,34 @@ const Settings = () => {
             <div className="grid md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-slate-700">Full Name</label>
-                <input 
-                  type="text" 
-                  defaultValue="Security Administrator"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-slate-900 font-medium focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-colors shadow-sm inset-shadow-sm"
-                />
+                {loading ? (
+                  <div className="h-12 bg-slate-100 animate-pulse rounded-xl w-full"></div>
+                ) : (
+                  <input 
+                    type="text" 
+                    defaultValue={profile?.name || ""}
+                    placeholder="Enter your name"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-slate-900 font-medium focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-colors shadow-sm inset-shadow-sm"
+                  />
+                )}
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-700">Main Email Address</label>
-                <input 
-                  type="email" 
-                  defaultValue="admin@webguardx.local"
-                  readOnly
-                  className="w-full bg-slate-100 border border-slate-200 rounded-xl py-3 px-4 text-slate-500 cursor-not-allowed font-medium"
-                />
+                <label className="text-sm font-semibold text-slate-700">Account Email Address</label>
+                {loading ? (
+                  <div className="h-12 bg-slate-100 animate-pulse rounded-xl w-full"></div>
+                ) : (
+                  <div className="relative">
+                    <input 
+                      type="email" 
+                      defaultValue={profile?.email || ""}
+                      readOnly
+                      className="w-full bg-slate-100 border border-slate-200 rounded-xl py-3 px-4 text-slate-500 cursor-not-allowed font-medium pr-24"
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 uppercase tracking-widest bg-slate-200 px-2 py-1 rounded-md">
+                      {profile?.provider || "LOCAL"}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
             <div className="mt-8">

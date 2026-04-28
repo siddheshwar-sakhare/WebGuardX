@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../api/axios";
 import Navbar from "../components/Navbar";
 import { DownloadCloud, FileText, Search, Filter } from "lucide-react";
 
@@ -10,10 +10,7 @@ const History = () => {
   useEffect(() => {
     const fetchHistory = async () => {
       try {
-        const token = localStorage.getItem("jwtToken");
-        const res = await axios.get("http://localhost:1002/api/zap/history", {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const res = await api.get("/api/zap/history");
         setHistory(res.data);
       } catch (err) {
         console.error("Failed to fetch history");
@@ -23,9 +20,7 @@ const History = () => {
   }, []);
 
   const handleDownload = (id, type) => {
-    const token = localStorage.getItem("jwtToken");
-    axios.get(`http://localhost:1002/api/zap/export/${id}/${type}`, {
-      headers: { Authorization: `Bearer ${token}` },
+    api.get(`/api/zap/export/${id}/${type}`, {
       responseType: 'blob'
     }).then(response => {
       const url = window.URL.createObjectURL(new Blob([response.data]));

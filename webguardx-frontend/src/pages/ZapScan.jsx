@@ -4,7 +4,7 @@ import Navbar from "../components/Navbar";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShieldAlert, Zap, Search, Activity, CheckCircle, AlertTriangle, Globe } from "lucide-react";
 
-const ZapScan = () => {
+const ZapScan = ({ isEmbedded = false }) => {
   const [url, setUrl] = useState("");
   const [activeScan, setActiveScan] = useState(false);
   const [result, setResult] = useState(null);
@@ -13,31 +13,36 @@ const ZapScan = () => {
   const [visibleCount, setVisibleCount] = useState(5);
 
   const startScan = async () => {
-    if (!url) {
-      setError("Target URL is required");
-      return;
+  if (!url) {
+    setError("Target URL is required");
+    return;
+  }
+
+  setLoading(true);
+  setError("");
+
+  try {
+    const res = await api.post("/api/zap/scan", { url, activeScan });
+
+    // Sort results by aiScore DESC
+    if (res.data && res.data.results) {
+      res.data.results.sort((a, b) => (b.aiScore || 0) - (a.aiScore || 0));
     }
 
-    try {
-      setError("");
-      setLoading(true);
-      setResult(null);
-
-      const res = await api.post("/api/zap/scan", { url, activeScan });
-      setResult(res.data);
-      setVisibleCount(5);
-    } catch (err) {
-      setError("Scan failed. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
+    setResult(res.data);
+    setVisibleCount(5);
+  } catch (err) {
+    setError("Scan failed. Please try again.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 selection:bg-indigo-100 selection:text-indigo-900 font-sans pb-20">
-      <Navbar />
+    <div className={!isEmbedded ? "min-h-screen bg-slate-50 text-slate-900 selection:bg-indigo-100 selection:text-indigo-900 font-sans pb-20" : "w-full font-sans"}>
+      {!isEmbedded && <Navbar />}
 
-      <div className="pt-32 px-6 relative z-10">
+      <div className={!isEmbedded ? "pt-32 px-6 relative z-10" : "pt-8 relative z-10"}>
         <div className="max-w-4xl mx-auto space-y-10">
           
           {/* HEADER */}
@@ -146,18 +151,22 @@ const ZapScan = () => {
                 className="space-y-8"
               >
                 {/* SUMMARY */}
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center justify-center">
-                    <span className="text-4xl font-black text-red-500 drop-shadow-sm">{result.results.filter(r => r.risk === "High").length}</span>
-                    <span className="text-xs text-slate-500 font-bold uppercase tracking-wider mt-2">High Risk</span>
+                    <span className="text-4xl font-black text-rose-600 drop-shadow-sm">{result.results.filter(r => r.priority === "CRITICAL").length}</span>
+                    <span className="text-xs text-slate-500 font-bold uppercase tracking-wider mt-2">Critical</span>
                   </div>
                   <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center justify-center">
-                    <span className="text-4xl font-black text-amber-500 drop-shadow-sm">{result.results.filter(r => r.risk === "Medium").length}</span>
-                    <span className="text-xs text-slate-500 font-bold uppercase tracking-wider mt-2">Medium Risk</span>
+                    <span className="text-4xl font-black text-red-500 drop-shadow-sm">{result.results.filter(r => r.priority === "HIGH").length}</span>
+                    <span className="text-xs text-slate-500 font-bold uppercase tracking-wider mt-2">High</span>
                   </div>
                   <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center justify-center">
-                    <span className="text-4xl font-black text-emerald-500 drop-shadow-sm">{result.results.filter(r => r.risk === "Low").length}</span>
-                    <span className="text-xs text-slate-500 font-bold uppercase tracking-wider mt-2">Low Risk</span>
+                    <span className="text-4xl font-black text-amber-500 drop-shadow-sm">{result.results.filter(r => r.priority === "MEDIUM").length}</span>
+                    <span className="text-xs text-slate-500 font-bold uppercase tracking-wider mt-2">Medium</span>
+                  </div>
+                  <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center justify-center">
+                    <span className="text-4xl font-black text-emerald-500 drop-shadow-sm">{result.results.filter(r => r.priority === "LOW").length}</span>
+                    <span className="text-xs text-slate-500 font-bold uppercase tracking-wider mt-2">Low</span>
                   </div>
                 </div>
 
@@ -176,15 +185,44 @@ const ZapScan = () => {
                       className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4 hover:shadow-md transition-shadow"
                     >
                       <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3">
-                        <h4 className="font-bold text-lg text-slate-900">{item.testName}</h4>
-                        <span className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider self-start sm:self-auto ${
-                          item.risk === "High" ? "bg-red-50 text-red-700 border border-red-200" :
-                          item.risk === "Medium" ? "bg-amber-50 text-amber-700 border border-amber-200" :
-                          item.risk === "Low" ? "bg-emerald-50 text-emerald-700 border border-emerald-200" :
-                          "bg-sky-50 text-sky-700 border border-sky-200"
-                        }`}>
-                          {item.risk}
-                        </span>
+                        <h4 className="font-bold text-lg text-slate-900 flex items-center gap-2">
+                          {item.testName}
+                          {item.exploitable && (
+                            <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-rose-100 text-rose-700 border border-rose-200">
+                              Directly Exploitable
+                            </span>
+                          )}
+                        </h4>
+                        <div className="flex items-center gap-3">
+                          <div className={`px-3 py-1 rounded-lg text-xs font-bold flex items-center gap-1.5 ${
+                            item.aiScore >= 80 ? "bg-rose-50 text-rose-700 border border-rose-100" :
+                            item.aiScore >= 60 ? "bg-red-50 text-red-700 border border-red-100" :
+                            item.aiScore >= 40 ? "bg-amber-50 text-amber-700 border border-amber-100" :
+                            "bg-emerald-50 text-emerald-700 border border-emerald-100"
+                          }`}>
+                            <Activity className="w-3.5 h-3.5" />
+                            AI Risk Score: {item.aiScore}
+                          </div>
+                          
+                          <span className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider self-start sm:self-auto ${
+                            item.priority === "CRITICAL" ? "bg-rose-600 text-white shadow-sm ring-2 ring-rose-600/20" :
+                            item.priority === "HIGH" ? "bg-red-50 text-red-700 border border-red-200" :
+                            item.priority === "MEDIUM" ? "bg-amber-50 text-amber-700 border border-amber-200" :
+                            "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                          }`}>
+                            {item.priority || item.risk}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="bg-indigo-50/50 p-4 rounded-xl border border-indigo-100/50 text-sm text-indigo-900">
+                        <div className="flex gap-2 items-start">
+                          <div className="mt-0.5 text-indigo-500"><Zap className="w-4 h-4" /></div>
+                          <div>
+                            <strong className="block mb-1 font-semibold">Gemini AI Engine Reasoning:</strong>
+                            <p className="leading-relaxed opacity-90">{item.reasoning}</p>
+                          </div>
+                        </div>
                       </div>
 
                       <p className="text-sm text-slate-600 leading-relaxed pl-4 border-l-2 border-slate-200">
@@ -195,6 +233,18 @@ const ZapScan = () => {
                         <strong className="text-slate-900 block mb-1">Recommendation:</strong> 
                         <div className="leading-relaxed whitespace-pre-wrap">{item.solution}</div>
                       </div>
+
+                      {(item.evidence || item.param || item.attack || item.otherInfo) && (
+                        <div className="bg-rose-50/50 p-5 rounded-xl border border-rose-100/50 text-sm text-rose-900 mt-4 space-y-2">
+                          <strong className="text-rose-900 block mb-2 flex items-center gap-1">
+                            <AlertTriangle className="w-4 h-4" /> Technical Details (Exact Error / Evidence):
+                          </strong>
+                          {item.evidence && <div><span className="font-semibold text-rose-800">Evidence:</span> <code className="bg-rose-100/50 px-1.5 py-0.5 rounded ml-1 font-mono text-xs break-all">{item.evidence}</code></div>}
+                          {item.param && <div><span className="font-semibold text-rose-800">Parameter:</span> <code className="bg-rose-100/50 px-1.5 py-0.5 rounded ml-1 font-mono text-xs">{item.param}</code></div>}
+                          {item.attack && <div><span className="font-semibold text-rose-800">Attack Payload:</span> <code className="bg-rose-100/50 px-1.5 py-0.5 rounded ml-1 font-mono text-xs break-all">{item.attack}</code></div>}
+                          {item.otherInfo && <div><span className="font-semibold text-rose-800">Other Info:</span> <div className="mt-1 whitespace-pre-wrap break-words">{item.otherInfo}</div></div>}
+                        </div>
+                      )}
 
                       <div className="flex items-center pt-2">
                         <a

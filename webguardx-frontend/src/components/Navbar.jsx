@@ -80,10 +80,10 @@ const Navbar = () => {
             ) : (
               <div className="flex items-center gap-5 pl-4 border-l border-slate-200">
                 <Link
-                  to="/nmap-scan"
+                  to="/scanners"
                   className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
                 >
-                  Network Scan
+                  Scanner Suite
                 </Link>
                 <Link
                   to="/history"
@@ -167,11 +167,11 @@ const Navbar = () => {
             ) : (
               <div className="pt-4 border-t border-slate-100 flex flex-col gap-3">
                 <Link
-                  to="/nmap-scan"
+                  to="/scanners"
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="text-base font-medium text-slate-600 hover:text-slate-900"
                 >
-                  Network Scan
+                  Scanner Suite
                 </Link>
                 <Link
                   to="/history"

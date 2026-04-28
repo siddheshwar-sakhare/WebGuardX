@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../../api/axios";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
 import { motion } from "framer-motion";
 
@@ -10,10 +10,7 @@ const AnalyticsBoard = () => {
   useEffect(() => {
     const fetchAnalytics = async () => {
       try {
-        const token = localStorage.getItem("jwtToken");
-        const res = await axios.get("http://localhost:1002/api/zap/analytics", {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const res = await api.get("/api/zap/analytics");
         setData(res.data);
       } catch (err) {
         console.error("Error fetching analytics", err);
@@ -28,6 +25,7 @@ const AnalyticsBoard = () => {
   if (!data) return null;
 
   const riskData = [
+    { name: "Critical", value: data.riskDistribution.Critical || 0, color: "#e11d48" }, // rose-600
     { name: "High", value: data.riskDistribution.High || 0, color: "#ef4444" },
     { name: "Medium", value: data.riskDistribution.Medium || 0, color: "#f59e0b" },
     { name: "Low", value: data.riskDistribution.Low || 0, color: "#10b981" },

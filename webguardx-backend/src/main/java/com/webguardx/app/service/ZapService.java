@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -19,6 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.web.client.RestTemplate;
 
 
 import com.webguardx.app.repository.ScanHistoryRepository;
@@ -38,6 +38,9 @@ public class ZapService {
     @Autowired
     private ScanHistoryRepository scanHistoryRepository;
 
+    @Autowired
+    private RiskScoringService riskScoringService;
+
 
     public ScanResult scan(String targetUrl, boolean activeScan, User user) {
 
@@ -53,8 +56,6 @@ public class ZapService {
             return new ScanResult("ERROR: ZAP API key not configured in application.properties", new ArrayList<>());
         }
 
-        HttpURLConnection conn = null;
-
         try {
             String base = "http://" + zapConfig.getHost() + ":" + zapConfig.getPort();
             String apiKey = zapConfig.getApiKey();
@@ -65,135 +66,88 @@ public class ZapService {
                 targetUrl = "http://" + targetUrl;
             }
 
-            String encodedTargetUrl = URLEncoder.encode(targetUrl, StandardCharsets.UTF_8);
+            // Use the raw targetUrl, RestTemplate URI variables will encode it correctly.
             logger.info("Starting ZAP scan for URL: {}", targetUrl);
             logger.info("ZAP API URL: {}", base);
 
+            RestTemplate restTemplate = new RestTemplate();
+            ObjectMapper mapper = new ObjectMapper();
+
             // Step 1: Test ZAP connection first
             try {
-                URL testUrl = new URL(base + "/JSON/core/view/version/?apikey=" + apiKey);
-                HttpURLConnection testConn = (HttpURLConnection) testUrl.openConnection();
-                testConn.setRequestMethod("GET");
-                testConn.setConnectTimeout(5000);
-                testConn.setReadTimeout(5000);
-
-                int responseCode = testConn.getResponseCode();
-                if (responseCode != 200) {
-                    logger.error("ZAP connection test failed with response code: {}", responseCode);
-                    return new ScanResult("ERROR: Cannot connect to ZAP. Make sure ZAP is running on " + base, new ArrayList<>());
-                }
-
-                ObjectMapper testMapper = new ObjectMapper();
-                JsonNode testRoot = testMapper.readTree(testConn.getInputStream());
+                String testUrl = base + "/JSON/core/view/version/?apikey=" + apiKey;
+                String testResponse = restTemplate.getForObject(testUrl, String.class);
+                JsonNode testRoot = mapper.readTree(testResponse);
                 logger.info("✅ Connected to ZAP version: {}", testRoot.path("version").asText("unknown"));
-                testConn.disconnect();
             } catch (Exception e) {
                 logger.error("Failed to connect to ZAP: {}", e.getMessage());
-                return new ScanResult("ERROR: Cannot connect to ZAP. Please start ZAP first. Details: " + e.getMessage(), new ArrayList<>());
+                return new ScanResult("ERROR: Cannot connect to ZAP. Please start ZAP first.", new ArrayList<>());
+            }
+
+            // Increase scan strength (Optional improvement)
+            try {
+                restTemplate.getForObject(base + "/JSON/ascan/action/setOptionAttackStrength/?Integer=HIGH&apikey={apikey}", String.class, apiKey);
+                restTemplate.getForObject(base + "/JSON/ascan/action/setOptionAlertThreshold/?Integer=LOW&apikey={apikey}", String.class, apiKey);
+            } catch (Exception e) {
+                logger.warn("Failed to set options (ZAP versions may vary). Continuing...");
             }
 
             // Step 2: Spider scan
-            // Step 2: Spider scan with correct Content-Type
             logger.info("Starting spider scan for URL: {}", targetUrl);
 
-// Create connection
-            URL spiderUrl = new URL(base + "/JSON/spider/action/scan/");
-            conn = (HttpURLConnection) spiderUrl.openConnection();
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-            conn.setDoOutput(true); // This is crucial for sending POST data
-            conn.setConnectTimeout(15000);
-            conn.setReadTimeout(60000);
+            String spiderUrl = base + "/JSON/spider/action/scan/?url={url}&apikey={apikey}&maxChildren=5&recurse=true";
+            String spiderRes = restTemplate.getForObject(spiderUrl, String.class, targetUrl, apiKey);
 
-// Build the POST data in the format the ZAP API expects
-            String postData = "url=" + encodedTargetUrl +
-                    "&apikey=" + apiKey +
-                    "&maxChildren=5&recurse=true&contextName=&maxDuration=0";
+            JsonNode spiderResNode = mapper.readTree(spiderRes);
+            String spiderScanId = spiderResNode.path("scan").asText();
 
-// Write the data to the connection
-            try (java.io.OutputStream os = conn.getOutputStream()) {
-                byte[] input = postData.getBytes(StandardCharsets.UTF_8);
-                os.write(input, 0, input.length);
+            if (spiderScanId == null || spiderScanId.isEmpty()) {
+                logger.error("Spider scan failed. Response: {}", spiderRes);
+                throw new RuntimeException("Failed to start spider scan: " + spiderRes);
             }
 
-            int spiderResponseCode = conn.getResponseCode();
-            if (spiderResponseCode != 200) {
-                // Read the error stream to understand why it failed
-                try (InputStream errorStream = conn.getErrorStream()) {
-                    if (errorStream != null) {
-                        ObjectMapper errorMapper = new ObjectMapper();
-                        JsonNode errorJson = errorMapper.readTree(errorStream);
-                        String errorMessage = errorJson.path("message").asText("Unknown error");
-                        logger.error("Spider scan failed with code: {}, error: {}", spiderResponseCode, errorMessage);
-                        return new ScanResult("ERROR: Spider scan failed - " + errorMessage, new ArrayList<>());
-                    }
-                }
-                return new ScanResult("ERROR: Spider scan failed with HTTP " + spiderResponseCode, new ArrayList<>());
+            logger.info("Spider scan started with ID: {}", spiderScanId);
+
+            // Wait for spider
+            while (true) {
+                String statusUrl = base + "/JSON/spider/view/status/?scanId={scanId}&apikey={apikey}";
+                String statusRes = restTemplate.getForObject(statusUrl, String.class, spiderScanId, apiKey);
+                int progress = mapper.readTree(statusRes).path("status").asInt(0);
+                
+                logger.info("Spider progress: {}%", progress);
+                if (progress >= 100) break;
+                
+                Thread.sleep(3000); // Wait 3 seconds
             }
+            
+            // FINAL BUFFER (critical)
+            Thread.sleep(2000);
 
-// Don't forget to disconnect
-            conn.disconnect();
-
-            // Step 3: Active scan (if requested) - FIXED VERSION
+            // Step 3: Active scan (if requested)
             if (activeScan) {
-                logger.info("Starting active scan...");
+                logger.info("Spider done, starting active scan...");
+                String activeUrl = base + "/JSON/ascan/action/scan/?url={url}&apikey={apikey}&recurse=true";
+                String activeRes = restTemplate.getForObject(activeUrl, String.class, targetUrl, apiKey);
+                String activeScanId = mapper.readTree(activeRes).path("scan").asText();
 
-                URL ascanUrl = new URL(base + "/JSON/ascan/action/scan/");
-                HttpURLConnection ascanConn = (HttpURLConnection) ascanUrl.openConnection();
-                ascanConn.setRequestMethod("POST");
-                ascanConn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-                ascanConn.setDoOutput(true);
-                ascanConn.setConnectTimeout(15000);
-                ascanConn.setReadTimeout(60000);
-
-                // Build POST data for active scan
-                String ascanPostData = "url=" + encodedTargetUrl +
-                        "&apikey=" + apiKey +
-                        "&recurse=true" +
-                        "&inScopeOnly=false" +
-                        "&scanPolicyName=" +
-                        "&method=" +
-                        "&postData=" +
-                        "&contextId=";
-
-                try (java.io.OutputStream os = ascanConn.getOutputStream()) {
-                    byte[] input = ascanPostData.getBytes(StandardCharsets.UTF_8);
-                    os.write(input, 0, input.length);
+                // Wait for Active Scan
+                while (true) {
+                    String statusUrl = base + "/JSON/ascan/view/status/?scanId={scanId}&apikey={apikey}";
+                    String statusRes = restTemplate.getForObject(statusUrl, String.class, activeScanId, apiKey);
+                    int progress = mapper.readTree(statusRes).path("status").asInt(0);
+                    
+                    logger.info("Active scan progress: {}%", progress);
+                    if (progress >= 100) break;
+                    
+                    Thread.sleep(5000); // Wait 5 seconds
                 }
-
-                int ascanResponseCode = ascanConn.getResponseCode();
-                if (ascanResponseCode != 200) {
-                    logger.error("Active scan failed with response code: {}", ascanResponseCode);
-                    // Read error stream for details
-                    try (InputStream errorStream = ascanConn.getErrorStream()) {
-                        if (errorStream != null) {
-                            ObjectMapper errorMapper = new ObjectMapper();
-                            JsonNode errorJson = errorMapper.readTree(errorStream);
-                            logger.error("Active scan error: {}", errorJson.toString());
-                        }
-                    }
-                } else {
-                    logger.info("Active scan started successfully");
-                }
-                ascanConn.disconnect();
             }
 
             // Step 4: Get alerts
             logger.info("Retrieving alerts...");
-            URL alertsUrl = new URL(base + "/JSON/core/view/alerts/?baseurl=" + encodedTargetUrl + "&apikey=" + apiKey);
-            conn = (HttpURLConnection) alertsUrl.openConnection();
-            conn.setRequestMethod("GET");
-            conn.setConnectTimeout(10000);
-            conn.setReadTimeout(30000);
-
-            int alertsResponseCode = conn.getResponseCode();
-            if (alertsResponseCode != 200) {
-                logger.error("Failed to get alerts. Response code: {}", alertsResponseCode);
-                return new ScanResult("ERROR: Failed to retrieve alerts from ZAP", new ArrayList<>());
-            }
-
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode root = mapper.readTree(conn.getInputStream());
+            String alertsUrl = base + "/JSON/core/view/alerts/?baseurl={url}&apikey={apikey}";
+            String alertsResponse = restTemplate.getForObject(alertsUrl, String.class, targetUrl, apiKey);
+            JsonNode root = mapper.readTree(alertsResponse);
             JsonNode alerts = root.get("alerts");
 
             List<ZapAlert> results = new ArrayList<>();
@@ -208,6 +162,12 @@ public class ZapService {
                             alert.has("solution") ? alert.get("solution").asText() : "",
                             alert.has("url") ? alert.get("url").asText() : targetUrl
                     );
+                    if (alert.has("evidence")) zapAlert.setEvidence(alert.get("evidence").asText());
+                    if (alert.has("param")) zapAlert.setParam(alert.get("param").asText());
+                    if (alert.has("attack")) zapAlert.setAttack(alert.get("attack").asText());
+                    if (alert.has("other")) zapAlert.setOtherInfo(alert.get("other").asText());
+
+                    riskScoringService.enrichAlert(zapAlert);
                     results.add(zapAlert);
                 }
             }
@@ -229,10 +189,6 @@ public class ZapService {
         } catch (Exception e) {
             logger.error("ZAP scan failed: {}", e.getMessage(), e);
             return new ScanResult("ERROR: " + e.getMessage(), new ArrayList<>());
-        } finally {
-            if (conn != null) {
-                conn.disconnect();
-            }
         }
     }
 }

@@ -26,6 +26,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private UserRepository userRepository;
 
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(JwtAuthenticationFilter.class);
+
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
@@ -34,24 +36,33 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String header = request.getHeader("Authorization");
 
-        if (header != null && header.startsWith("Bearer ")) {
+        if (header == null || !header.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
-            String token = header.substring(7);
-            String email = jwtUtil.extractEmail(token);
+        String token = header.substring(7);
 
-            if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+        try {
+            if (!token.isBlank() && token.contains(".")) {
+                String email = jwtUtil.extractEmail(token);
 
-                if (jwtUtil.isTokenValid(token)) {
+                if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    if (jwtUtil.isTokenValid(token)) {
+                        UsernamePasswordAuthenticationToken auth =
+                                new UsernamePasswordAuthenticationToken(
+                                        email, null, null);
 
-                    UsernamePasswordAuthenticationToken auth =
-                            new UsernamePasswordAuthenticationToken(
-                                    email, null, null);
+                        auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-                    auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                    SecurityContextHolder.getContext().setAuthentication(auth);
+                        SecurityContextHolder.getContext().setAuthentication(auth);
+                    }
                 }
+            } else {
+                log.warn("Malformed JWT attempt detected: {}", token);
             }
+        } catch (Exception e) {
+            log.warn("Invalid JWT: {}", token);
         }
 
         filterChain.doFilter(request, response);
