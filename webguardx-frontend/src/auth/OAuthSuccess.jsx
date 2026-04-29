@@ -5,17 +5,25 @@ const OAuthSuccess = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-  const params = new URLSearchParams(window.location.search);
-  const token = params.get("token");
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("token");
 
-  if (token) {
-    localStorage.setItem("token", token);
-    window.location.href = "/dashboard";  //siddhu image error about navigae !!!!!!
-  } else {
-    window.location.href = "/login";
-  }
-}, []);
-
+    if (token) {
+      if (window.opener) {
+        window.opener.postMessage({ type: 'OAUTH_SUCCESS', token: token }, window.location.origin);
+        window.close();
+      } else {
+        localStorage.setItem("token", token);
+        window.location.href = "/dashboard";
+      }
+    } else {
+      if (window.opener) {
+        window.close();
+      } else {
+        window.location.href = "/login";
+      }
+    }
+  }, []);
 
   return (
     <div className="flex items-center justify-center h-screen bg-gray-950 text-white">

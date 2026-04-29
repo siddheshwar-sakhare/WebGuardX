@@ -112,6 +112,9 @@ public class NmapService {
         // Add nmap path
         command.add(nmapConfig.getNmapPath());
 
+        // Treat all hosts as online (skip ping sweep) to avoid "no result" if ICMP is blocked
+        command.add("-Pn");
+
         // Add scan speed (T1-T5)
         command.add("-T" + request.getScanSpeed());
 
